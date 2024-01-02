@@ -22,12 +22,18 @@ class WebsocketOutputDevice(BaseOutputDevice):
         self.active = False
         self.queue: asyncio.Queue[str] = asyncio.Queue()
 
+    # TODO: Edit to send raw data instead of mp3
+    # Github issue:
+    #
+    # audio is delayed and often cut off
+    # we need to send the raw audio data instead of converting to mp3, this may be the cause of the delay. 
+    # maybe there is some data being cut off when converting to mp3    
+    
     def convert_to_mp3(self, chunk: bytes) -> bytes:
-            # Assuming chunk is raw audio data
             audio = AudioSegment.from_raw(io.BytesIO(chunk), 
-                                        sample_width=2, # 2 bytes for 16-bit audio
+                                        sample_width=2,
                                         frame_rate=self.sampling_rate, 
-                                        channels=1) # mono
+                                        channels=1) 
             buffer = io.BytesIO()
             audio.export(buffer, format="mp3")
             return buffer.getvalue()
